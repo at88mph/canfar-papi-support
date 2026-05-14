@@ -1,0 +1,383 @@
+/* CANFAR / SKAO Permissions API — deck overrides (loads after Reveal + theme). */
+
+.title-slide h1 {
+  font-size: 1.85em;
+  line-height: 1.2;
+  margin-bottom: 0.6em;
+}
+
+.title-slide .subtitle {
+  font-size: 0.85em;
+  opacity: 0.92;
+  max-width: 38em;
+  margin: 0 auto 2em;
+  line-height: 1.45;
+}
+
+.title-slide .author {
+  font-size: 0.75em;
+  color: #ff6f61;
+  letter-spacing: 0.02em;
+  margin-top: 1.5em;
+  opacity: 0.85;
+}
+
+/*
+  Reveal fits each slide to the viewport with overflow hidden; tall slides
+  clip unless content lives in a scrollable inner region (flex + min-height: 0).
+*/
+.deck-flow {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0.35em 0.65em 0.5em;
+  overflow: hidden;
+}
+
+.deck-flow .deck-flow-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 56em;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding-right: 0.4em;
+  margin-right: -0.15em;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.deck-flow h2 {
+  font-size: 1.35em;
+  margin-bottom: 0.25em;
+  text-align: center;
+}
+
+.deck-flow .flow-lead {
+  font-size: 0.75em;
+  opacity: 0.88;
+  max-width: 44em;
+  margin: 0 auto 0.65em;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.deck-flow .flow {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.deck-flow .flow--horizontal .flow-track {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.2em 0.35em;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.deck-flow .flow--horizontal .flow-step {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35em;
+  padding: 0.45em 0.42em 0.5em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+
+.deck-flow .flow--horizontal .flow-step--service {
+  background: rgba(255, 111, 97, 0.12);
+  border-color: rgba(255, 111, 97, 0.35);
+}
+
+.deck-flow .flow--horizontal .flow-step--cavern {
+  background: rgba(120, 190, 235, 0.12);
+  border-color: rgba(120, 190, 235, 0.38);
+}
+
+.deck-flow .flow--horizontal .flow-step--papi {
+  background: rgba(180, 145, 255, 0.13);
+  border-color: rgba(180, 145, 255, 0.42);
+}
+
+.deck-flow .flow--horizontal .flow-idx {
+  flex: 0 0 auto;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  text-align: center;
+  font-size: 0.65em;
+  font-weight: 700;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.deck-flow .flow--horizontal .flow-body {
+  width: 100%;
+}
+
+.deck-flow .flow--horizontal .flow-title {
+  font-size: 0.68em;
+  font-weight: 600;
+  margin: 0 0 0.15em;
+  line-height: 1.2;
+}
+
+.deck-flow .flow--horizontal .flow-detail {
+  font-size: 0.54em;
+  line-height: 1.3;
+  opacity: 0.88;
+  margin: 0;
+}
+
+.deck-flow .flow-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.95em;
+  opacity: 0.95;
+}
+
+.deck-flow .flow-arrow--right {
+  flex: 0 0 auto;
+  align-self: center;
+  font-size: 1.25em;
+  line-height: 1;
+  padding: 0 0.02em;
+  color: #ff6f61;
+  opacity: 0.9;
+  user-select: none;
+}
+
+.deck-flow .flow-outcomes {
+  flex: 0 0 9.75em;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28em;
+  justify-content: center;
+}
+
+.deck-flow .flow--horizontal .flow-outcome {
+  flex: 0 0 auto;
+  max-width: none;
+  padding: 0.38em 0.42em;
+  font-size: 0.52em;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+  line-height: 1.3;
+}
+
+.deck-flow .flow-outcome--ok {
+  border-color: rgba(120, 220, 160, 0.5);
+  background: rgba(120, 220, 160, 0.08);
+}
+
+.deck-flow .flow-outcome--deny {
+  border-color: rgba(255, 160, 140, 0.45);
+  background: rgba(255, 160, 140, 0.07);
+}
+
+/* Coming changes: chevron (>) pipeline + compact type (fits without scrolling). */
+#coming-changes.deck-flow {
+  padding: 0.28em 0.5em 0.38em;
+  /*
+    “Notch” triangles (::before) must match the slide background (cf.
+    https://codepen.io/robvnet/pen/OQRrbV). Reveal Moon fallback if var unset.
+  */
+  --chevron-cut-bg: var(--r-background-color, #2e344f);
+  --chev-w: 0.55em;
+  --chev-h: 1.55em;
+}
+
+#coming-changes h2 {
+  font-size: 1.05em;
+  margin-bottom: 0.12em;
+}
+
+#coming-changes .flow-lead {
+  font-size: 0.56em;
+  margin: 0 auto 0.38em;
+  line-height: 1.32;
+  max-width: 48em;
+}
+
+#coming-changes .deck-flow-inner {
+  max-width: 100%;
+  padding-right: 0.25em;
+}
+
+#coming-changes .chevron-cell .flow-title {
+  font-size: 0.5em;
+  margin: 0 0 0.1em;
+}
+
+#coming-changes .chevron-cell .flow-detail {
+  font-size: 0.38em;
+  line-height: 1.26;
+}
+
+#coming-changes .chevron-cell .flow-body {
+  position: relative;
+  z-index: 3;
+}
+
+#coming-changes .chevron-cell .flow-idx {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  width: 1.3em;
+  height: 1.3em;
+  line-height: 1.3em;
+  text-align: center;
+  font-size: 0.55em;
+  font-weight: 700;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#coming-changes .flow-code {
+  font-size: 0.88em;
+}
+
+#coming-changes .chevron-cell .flow-outcomes {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: 0;
+  gap: 0.18em;
+  width: 100%;
+}
+
+#coming-changes .chevron-cell .flow-outcome {
+  font-size: 0.38em;
+  padding: 0.28em 0.32em;
+  line-height: 1.28;
+  border-radius: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+}
+
+/* CodePen-style chevrons: ::after = tip into next cell; ::before = slide-colored cut (middle cells only). */
+#coming-changes .chevron-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+}
+
+#coming-changes .chevron-track > li {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+#coming-changes .chevron-track > li:not(:last-child) {
+  margin-right: 0.22em;
+}
+
+#coming-changes .chevron-track > li.chevron-track__outcomes {
+  flex: 0 0 7em;
+  min-width: 0;
+}
+
+#coming-changes .chevron-cell {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  gap: 0.22em;
+  /* Fixed inset: .flow-idx top aligns across cells (row stretch makes heights differ). */
+  --chevron-idx-from-top: 0.32em;
+  padding: var(--chevron-idx-from-top) 0.4em 0.32em calc(0.38em + var(--chev-w));
+  min-height: calc(2 * var(--chev-h) + 0.85em);
+  box-sizing: border-box;
+}
+
+#coming-changes .chevron-track > li:first-child .chevron-cell {
+  padding-left: 0.38em;
+  border-radius: 7px 0 0 7px;
+}
+
+#coming-changes .chevron-track > li:last-child .chevron-cell {
+  padding-right: 0.42em;
+  border-radius: 0 7px 7px 0;
+}
+
+/* Rear “cut” — same color as slide so the previous cell’s tip reads as going *into* this one. */
+#coming-changes .chevron-cell::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-top: var(--chev-h) solid transparent;
+  border-bottom: var(--chev-h) solid transparent;
+  border-left: var(--chev-w) solid var(--chevron-cut-bg);
+  z-index: 2;
+  pointer-events: none;
+}
+
+#coming-changes .chevron-track > li:first-child .chevron-cell::before {
+  display: none;
+}
+
+/* Forward tip — must match this cell’s fill (flat breadcrumb style). */
+#coming-changes .chevron-cell::after {
+  content: "";
+  position: absolute;
+  right: calc(-1 * var(--chev-w));
+  top: 0;
+  border-top: var(--chev-h) solid transparent;
+  border-bottom: var(--chev-h) solid transparent;
+  border-left: var(--chev-w) solid var(--chevron-tip);
+  z-index: 10;
+  pointer-events: none;
+}
+
+#coming-changes .chevron-track > li:last-child .chevron-cell::after {
+  display: none;
+}
+
+#coming-changes .chevron-cell--user {
+  background: rgba(255, 255, 255, 0.08);
+  --chevron-tip: rgba(255, 255, 255, 0.08);
+}
+
+#coming-changes .chevron-cell--skaha {
+  background: rgba(255, 111, 97, 0.22);
+  --chevron-tip: rgba(255, 111, 97, 0.22);
+}
+
+#coming-changes .chevron-cell--papi {
+  background: rgba(180, 145, 255, 0.22);
+  --chevron-tip: rgba(180, 145, 255, 0.22);
+}
+
+#coming-changes .chevron-cell--outcomes {
+  justify-content: center;
+  padding-top: 0.28em;
+  padding-bottom: 0.28em;
+  background: rgba(255, 255, 255, 0.04);
+  --chevron-tip: rgba(255, 255, 255, 0.04);
+}

@@ -298,6 +298,44 @@
   min-width: 0;
 }
 
+/* Talking-point focus: one step highlighted; arrow keys advance (see index.html). */
+#coming-changes .chevron-track > li {
+  transition: opacity 0.22s ease, filter 0.22s ease;
+}
+
+#coming-changes .chevron-track > li:not(.is-chevron-current) {
+  opacity: 0.48;
+  filter: saturate(0.65);
+}
+
+#coming-changes .chevron-track > li.is-chevron-current {
+  opacity: 1;
+  filter: none;
+  position: relative;
+  z-index: 3;
+}
+
+/* Emphasize each step by strengthening its own hue (no extra “frame”). */
+#coming-changes .chevron-track > li.is-chevron-current .chevron-cell--user {
+  background: rgba(255, 255, 255, 0.18);
+  --chevron-tip: rgba(255, 255, 255, 0.18);
+}
+
+#coming-changes .chevron-track > li.is-chevron-current .chevron-cell--skaha {
+  background: rgba(255, 111, 97, 0.4);
+  --chevron-tip: rgba(255, 111, 97, 0.4);
+}
+
+#coming-changes .chevron-track > li.is-chevron-current .chevron-cell--papi {
+  background: rgba(180, 145, 255, 0.4);
+  --chevron-tip: rgba(180, 145, 255, 0.4);
+}
+
+#coming-changes .chevron-track > li.is-chevron-current .chevron-cell--outcomes {
+  background: rgba(255, 255, 255, 0.12);
+  --chevron-tip: rgba(255, 255, 255, 0.12);
+}
+
 #coming-changes .chevron-cell {
   position: relative;
   flex: 1 1 auto;
@@ -313,6 +351,7 @@
   padding: var(--chevron-idx-from-top) 0.4em 0.32em calc(0.38em + var(--chev-w));
   min-height: calc(2 * var(--chev-h) + 0.85em);
   box-sizing: border-box;
+  transition: background 0.22s ease;
 }
 
 #coming-changes .chevron-track > li:first-child .chevron-cell {

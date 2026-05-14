@@ -173,7 +173,7 @@
               the request.
             </p>
             <ul class="chevron-track" role="list">
-              <li>
+              <li class="is-chevron-current" aria-current="step">
                 <div class="chevron-cell chevron-cell--user">
                   <span class="flow-idx">1</span>
                   <div class="flow-body">
@@ -259,6 +259,87 @@
         height: 720,
         margin: 0.08,
       });
+
+      (function () {
+        const SLIDE_ID = "coming-changes";
+        var steps = [];
+        var idx = 0;
+
+        function refreshSteps() {
+          var slide = document.getElementById(SLIDE_ID);
+          steps = slide ? Array.prototype.slice.call(slide.querySelectorAll(".chevron-track > li")) : [];
+        }
+
+        function setChevronStep(i) {
+          refreshSteps();
+          if (!steps.length) return;
+          idx = Math.max(0, Math.min(i, steps.length - 1));
+          steps.forEach(function (li, j) {
+            var on = j === idx;
+            li.classList.toggle("is-chevron-current", on);
+            if (on) {
+              li.setAttribute("aria-current", "step");
+            } else {
+              li.removeAttribute("aria-current");
+            }
+          });
+        }
+
+        function isComingChangesActive() {
+          var slide = Reveal.getCurrentSlide && Reveal.getCurrentSlide();
+          return slide && slide.id === SLIDE_ID;
+        }
+
+        function inOverview() {
+          return typeof Reveal.isOverview === "function" && Reveal.isOverview();
+        }
+
+        function onSlideChanged() {
+          if (isComingChangesActive()) {
+            setChevronStep(0);
+          }
+        }
+
+        Reveal.on("ready", function () {
+          refreshSteps();
+          if (isComingChangesActive()) {
+            setChevronStep(0);
+          }
+        });
+        Reveal.on("slidechanged", onSlideChanged);
+
+        document.addEventListener(
+          "keydown",
+          function (e) {
+            if (!isComingChangesActive() || inOverview()) return;
+
+            var next =
+              e.key === "ArrowRight" ||
+              e.key === "ArrowDown" ||
+              e.key === "PageDown";
+            var prev =
+              e.key === "ArrowLeft" ||
+              e.key === "ArrowUp" ||
+              e.key === "PageUp";
+
+            if (!next && !prev) return;
+
+            refreshSteps();
+            if (steps.length === 0) return;
+
+            if (next && idx < steps.length - 1) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              setChevronStep(idx + 1);
+            } else if (prev && idx > 0) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              setChevronStep(idx - 1);
+            }
+          },
+          true
+        );
+      })();
     </script>
   </body>
 </html>

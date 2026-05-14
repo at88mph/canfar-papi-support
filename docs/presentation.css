@@ -312,7 +312,6 @@
   opacity: 1;
   filter: none;
   position: relative;
-  z-index: 3;
 }
 
 /* Emphasize each step by strengthening its own hue (no extra “frame”). */

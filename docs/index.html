@@ -172,6 +172,8 @@
               exchange, then a dedicated authorization call for the user behind
               the request.
             </p>
+            <h3>GitHub Pull Request</h3>
+            <a class="flow-code" href="https://github.com/opencadc/ac/pull/215">https://github.com/opencadc/ac/pull/215</a>
             <ul class="chevron-track" role="list">
               <li class="is-chevron-current" aria-current="step">
                 <div class="chevron-cell chevron-cell--user">
@@ -248,9 +250,61 @@
           </div>
         </section>
         <section id="skaha-changes">
-          <h2>Skaha</h2>
+          <h2>Skaha Modifications</h2>
           <h3>Web Service</h3>
+          <ul>
+            <li>Accept configuration for the Permissions API (OpenCADC <span class="flow-code">cadc-permissions-client</span>)</li>
+            <li>Default to existing Group check configuration</li>
+            <li>Remove Admin API key request to Cavern</li>
+          </ul>
           <h3>Helm Chart</h3>
+          <ul>
+            <li>Add new configuration for the Permissions API</li>
+            <li>Remove Admin API key request to Cavern</li>
+          </ul>
+        </section>
+        <section id="skaha-helm-changes">
+          <h2>Skaha Helm Chart Modifications</h2>
+          <p class="small-text">Previously used <span class="flow-code">usersGroup</span> to configure the Group check.</p>
+          <span class="flow-code">values.yaml</span>
+          <pre><code class="yaml">
+            deployment:
+              skaha:
+                sessions:
+                  authorization:
+                    permissionsAPI:
+                      enabled: true
+                      baseURL: "https://permissions.srcnet.skao.int/api"
+                      authAPIBaseURL: "https://authn.srcnet.skao.int/api"
+                      type: "route"
+                      route: "/skaha/v1"
+                      name: "canfar-api"
+                      version: "1"
+                      method: "GET"
+                    group:
+                      enabled: false
+                      uri: "ivo://skao.int/gms?roles/prod/user"
+              </code></pre>
+        </section>
+        <section id="cavern-helm-changes">
+          <h2>Cavern Helm Chart Modifications</h2>
+          <p class="small-text">Previously used <span class="flow-code">adminApiKey</span> to configure the Admin API key check.</p>
+          <span class="flow-code">values.yaml</span>
+          <pre><code class="yaml">
+            deployment:
+              cavern:
+                allocations:
+                  authorization:
+                    permissionsAPI:
+                      enabled: true
+                      baseURL: "https://permissions.srcnet.skao.int/api"
+                      authAPIBaseURL: "https://authn.srcnet.skao.int/api"
+                      type: "route"
+                      route: "/cavern/nodes/home/{username}"
+                      name: "canfar-api"
+                      version: "1"
+                      method: "GET"
+          </code></pre>
         </section>
       </div>
     </div>

@@ -360,30 +360,36 @@
         <section id="skaha-helm-changes">
           <h2>Skaha Helm Chart Modifications</h2>
           <p class="small-text">Previously used <span class="flow-code">usersGroup</span> to configure the Group check.</p>
-          <span class="flow-code">values.yaml</span>
-          <pre><code class="yaml">
-            deployment:
-              skaha:
-                sessions:
-                  authorization:
-                    permissionsAPI:
-                      enabled: true
-                      baseURL: "https://permissions.srcnet.skao.int/api"
-                      authAPIBaseURL: "https://authn.srcnet.skao.int/api"
-                      type: "route"
-                      route: "/skaha/v1"
-                      name: "canfar-api"
-                      version: "1"
-                      method: "GET"
-                    group:
-                      enabled: false
-                      uri: "ivo://skao.int/gms?roles/prod/user"
-              </code></pre>
+          <span class="flow-code"><a href="https://github.com/opencadc/deployments/blob/2026.2/helm/applications/skaha/values.yaml#L136">values.yaml</a></span>
+          <pre>
+            <code class="yaml">
+              deployment:
+                skaha:
+                  sessions:
+                    authorization:
+                      permissionsAPI:
+                        enabled: true
+                        baseURL: "https://permissions.srcnet.skao.int/api"
+                        authAPIBaseURL: "https://authn.srcnet.skao.int/api"
+                        type: "route"
+                        route: "/skaha/v1"
+                        name: "canfar-api"
+                        version: "1"
+                        method: "GET"
+                      group:
+                        enabled: false
+                        uri: "ivo://skao.int/gms?roles/prod/user"
+              </code>
+            </pre>
+            <p class="deck-crosslinks deck-crosslinks--footer">
+              ·
+              <a href="https://github.com/opencadc/deployments/pull/400">PR #400</a>
+            </p>
         </section>
         <section id="cavern-helm-changes">
           <h2>Cavern Helm Chart Modifications</h2>
           <p class="small-text">Previously used <span class="flow-code">adminApiKey</span> to configure the Admin API key check.</p>
-          <span class="flow-code">values.yaml</span>
+          <span class="flow-code"><a href="https://github.com/opencadc/deployments/blob/2026.2/helm/applications/cavern/values.yaml#L72">values.yaml</a></span>
           <pre><code class="yaml">
             deployment:
               cavern:
@@ -399,6 +405,10 @@
                       version: "1"
                       method: "GET"
           </code></pre>
+          <p class="deck-crosslinks deck-crosslinks--footer">
+            ·
+            <a href="https://github.com/opencadc/deployments/pull/400">PR #400</a>
+          </p>
         </section>
         <section id="demonstration">
           <h2>Demonstrable output</h2>
@@ -411,7 +421,7 @@
             <li>Align routes with config: <span class="flow-code">/skaha/v1</span> (sessions) and <span class="flow-code">/cavern/nodes/home/{username}</span> (home).</li>
           </ul> -->
           <h3>Sanitized sample trace</h3>
-          <pre class="demo-transcript"><code class="bash" style="overflow: initial;"># Skaha → Permissions API (conceptual)
+          <pre class="demo-transcript"><code class="bash" style="overflow: initial;"># Skaha → Permissions API
 GET https://example.org/skaha/v1/session
 Authorization: Bearer &lt;REDACTED_EXCHANGED_TOKEN&gt;
 → 200 OK
@@ -424,16 +434,11 @@ checkErrors: 200 for https://authn.srcnet.skao.int/api/v1/token/exchange/canfar-
 
 POST - send done: https://permissions.srcnet.skao.int/api/v1/authorise/route/canfar-api?route=%2Fskaha&token=...&method=GET&version=1
 checkErrors: 200 for https://permissions.srcnet.skao.int/api/v1/authorise/route/canfar-api?route=%2Fskaha&token=...&method=GET&version=1</code></pre>
-          <p class="deck-crosslinks deck-crosslinks--footer">
-            ·
-            <a href="https://github.com/opencadc/ac/pull/215">PR #215</a>
-          </p>
         </section>
         <section id="considerations-follow-up">
           <h2>Operational considerations</h2>
           <p class="deck-lead">
-            Central policy is clearer for security and ops—plan for dependence on
-            the Permissions API path and help users when access is centralized.
+            Central policy is clearer for security and ops.
           </p>
           <ul class="deck-bullet-list">
             <li>

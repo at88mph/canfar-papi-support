@@ -172,9 +172,7 @@
               exchange, then a dedicated authorization call for the user behind
               the request.
             </p>
-            <h3>GitHub Pull Request</h3>
-            <a class="flow-code" href="https://github.com/opencadc/ac/pull/215">https://github.com/opencadc/ac/pull/215</a>
-            <ul class="chevron-track" role="list">
+            <ul class="chevron-track" id="skaha_chevron_track" role="list">
               <li class="is-chevron-current" aria-current="step">
                 <div class="chevron-cell chevron-cell--user">
                   <span class="flow-idx">1</span>
@@ -247,7 +245,103 @@
                 </div>
               </li>
             </ul>
+            <ul class="chevron-track" id="cavern_chevron_track" role="list">
+              <li>
+                <div class="chevron-cell chevron-cell--user">
+                  <span class="flow-idx">1</span>
+                  <div class="flow-body">
+                    <p class="flow-title">
+                      User calls Cavern to request a new allocation
+                    </p>
+                    <p class="flow-detail">
+                      The client presents a
+                      <span class="flow-code">Bearer</span> token on the Cavern request.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="chevron-cell chevron-cell--skaha">
+                  <span class="flow-idx">2</span>
+                  <div class="flow-body">
+                    <p class="flow-title">Cavern requests token exchange</p>
+                    <p class="flow-detail">
+                      Cavern calls the Permissions API to
+                      <strong>request</strong> exchanging the user&rsquo;s token
+                      for an API-facing credential.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="chevron-cell chevron-cell--papi">
+                  <span class="flow-idx">3</span>
+                  <div class="flow-body">
+                    <p class="flow-title">If approved: exchange</p>
+                    <p class="flow-detail">
+                      When the API approves, Cavern completes the
+                      <strong>token exchange</strong> for that user.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="chevron-cell chevron-cell--papi">
+                  <span class="flow-idx">4</span>
+                  <div class="flow-body">
+                    <p class="flow-title">Authorization at the API</p>
+                    <p class="flow-detail">
+                      Cavern uses the <strong>exchanged</strong> token to ask the
+                      Permissions API whether this user has
+                      <strong>permission</strong> to create a new allocation.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              <li class="chevron-track__outcomes">
+                <div class="chevron-cell chevron-cell--outcomes">
+                  <div
+                    class="flow-outcomes"
+                    role="group"
+                    aria-label="Authorization decision"
+                  >
+                    <div class="flow-outcome flow-outcome--ok">
+                      <strong>Allowed</strong> &mdash; API grants authorization;
+                      Cavern creates the new allocation.
+                    </div>
+                    <div class="flow-outcome flow-outcome--deny">
+                      <strong>Denied</strong> &mdash; exchange or authorization
+                      fails &rarr; e.g. 401 / 403.
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
+        </section>
+        <section id="what-users-notice">
+          <h2>What users should notice</h2>
+          <ul class="deck-bullet-list">
+            <li>
+              The portal and primary workflows can look <strong>unchanged</strong>
+              for authorized users; enforcement moves behind the scenes to the
+              Permissions API.
+            </li>
+            <li>
+              <strong>Same happy path</strong>: sessions and storage allocation
+              succeed when centralized policy allows—still driven by the user's
+              identity and Bearer token on Skaha and Cavern.
+            </li>
+            <li>
+              <strong>Operational clarity</strong>: fewer bespoke paths (group URI
+              only inside Skaha; admin API key to Cavern where retired)—auditing
+              lines up with Permissions API routes configured in Helm.
+            </li>
+            <li>
+              Failures may surface as familiar HTTP errors (e.g. 403); semantics
+              should reflect centralized policy rather than only local checks—details belong in ops/runbooks.
+            </li>
+          </ul>
         </section>
         <section id="skaha-changes">
           <h2>Skaha Modifications</h2>
@@ -306,6 +400,72 @@
                       method: "GET"
           </code></pre>
         </section>
+        <section id="demonstration">
+          <h2>Demonstrable output</h2>
+          <p class="deck-lead">
+            Backend changes are easiest to show as <strong>observable traces</strong>.
+          </p>
+          <!-- <ul class="deck-bullet-list deck-bullet-list--compact">
+            <li>Use <strong>staging or sandbox</strong>; redact Bearer tokens and request IDs.</li>
+            <li>Show Skaha/Cavern outbound checks against the Permissions API <strong>base URL</strong> from Helm.</li>
+            <li>Align routes with config: <span class="flow-code">/skaha/v1</span> (sessions) and <span class="flow-code">/cavern/nodes/home/{username}</span> (home).</li>
+          </ul> -->
+          <h3>Sanitized sample trace</h3>
+          <pre class="demo-transcript"><code class="bash" style="overflow: initial;"># Skaha → Permissions API (conceptual)
+GET https://example.org/skaha/v1/session
+Authorization: Bearer &lt;REDACTED_EXCHANGED_TOKEN&gt;
+→ 200 OK
+
+# Log (illustrative)
+POST - send done: https://permissions.srcnet.skao.int/api/v1/authorise/exchange/canfar-api?token=...&version=1
+checkErrors: 200 for https://permissions.srcnet.skao.int/api/v1/authorise/exchange/canfar-api?token=...&version=1
+
+checkErrors: 200 for https://authn.srcnet.skao.int/api/v1/token/exchange/canfar-api?access_token=...&version=1
+
+POST - send done: https://permissions.srcnet.skao.int/api/v1/authorise/route/canfar-api?route=%2Fskaha&token=...&method=GET&version=1
+checkErrors: 200 for https://permissions.srcnet.skao.int/api/v1/authorise/route/canfar-api?route=%2Fskaha&token=...&method=GET&version=1</code></pre>
+          <p class="deck-crosslinks deck-crosslinks--footer">
+            ·
+            <a href="https://github.com/opencadc/ac/pull/215">PR #215</a>
+          </p>
+        </section>
+        <section id="considerations-follow-up">
+          <h2>Operational considerations</h2>
+          <p class="deck-lead">
+            Central policy is clearer for security and ops—plan for dependence on
+            the Permissions API path and help users when access is centralized.
+          </p>
+          <ul class="deck-bullet-list">
+            <li>
+              <strong>Risk:</strong> each protected operation can incur
+              <strong>about three extra network calls</strong> compared with
+              legacy checks—in practice, latency, timeouts, and failure modes tie
+              your services to Permissions API availability and behaviour.
+            </li>
+            <li>
+              <strong>Mitigate:</strong> explore <strong>caching</strong> (TTLs,
+              keyed by resource and identity where policy allows),
+              concurrency limits, graceful degradation docs, and
+              <strong>clear user messaging</strong> when centralized policy denies
+              access or the dependency is unavailable.
+            </li>
+            <li>
+              <strong>Who to contact for access:</strong> entitlement changes live
+              in one place—point people to how they should
+              <strong>request permission</strong> now. Example contact (replace before
+              publishing):
+              <a href="mailto:canfar-access@skao.int?subject=CANFAR%20access%20request">canfar-access@skao.int</a>
+            </li>
+          </ul>
+        </section>
+        <section id="next_steps">
+          <h2>Next steps</h2>
+          <ul class="deck-bullet-list">
+            <li>Document next release (2026.3)</li>
+            <li>Ensure cleanup complete</li>
+            <li><a href="https://gitlab.com/ska-telescope/src/src-service-apis/ska-src-permissions-api/-/merge_requests/145">Permissions API MR #145</a></li>
+          </ul>
+        </section>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
@@ -320,41 +480,51 @@
       });
 
       (function () {
-        const SLIDE_ID = "coming-changes";
-        var steps = [];
-        var idx = 0;
-        var allHighlighted = false;
+        var SLIDE_ID = "coming-changes";
+        var SKAHA_TRACK_ID = "skaha_chevron_track";
+        var CAVERN_TRACK_ID = "cavern_chevron_track";
 
-        function getTrack() {
-          var slide = document.getElementById(SLIDE_ID);
-          return slide ? slide.querySelector(".chevron-track") : null;
+        var phase = "skaha";
+        var skahaIdx = 0;
+        var cavernIdx = 0;
+        var skahaAll = false;
+        var cavernAll = false;
+
+        function slideEl() {
+          return document.getElementById(SLIDE_ID);
         }
 
-        function refreshSteps() {
-          var slide = document.getElementById(SLIDE_ID);
-          steps = slide ? Array.prototype.slice.call(slide.querySelectorAll(".chevron-track > li")) : [];
+        function getSkahaTrack() {
+          var s = slideEl();
+          return s ? document.getElementById(SKAHA_TRACK_ID) : null;
         }
 
-        function clearAllHighlighted() {
-          allHighlighted = false;
-          var track = getTrack();
-          if (track) {
-            track.classList.remove("chevron-track--all-current");
-          }
-          refreshSteps();
-          steps.forEach(function (li) {
+        function getCavernTrack() {
+          var s = slideEl();
+          return s ? document.getElementById(CAVERN_TRACK_ID) : null;
+        }
+
+        function listItems(track) {
+          if (!track) return [];
+          return Array.prototype.slice.call(track.querySelectorAll(":scope > li"));
+        }
+
+        function clearTrack(track) {
+          if (!track) return;
+          track.classList.remove("chevron-track--all-current");
+          listItems(track).forEach(function (li) {
             li.classList.remove("is-chevron-current");
             li.removeAttribute("aria-current");
           });
         }
 
-        function setChevronStep(i) {
-          refreshSteps();
-          if (!steps.length) return;
-          clearAllHighlighted();
-          idx = Math.max(0, Math.min(i, steps.length - 1));
-          steps.forEach(function (li, j) {
-            var on = j === idx;
+        function setTrackStep(track, index) {
+          var items = listItems(track);
+          if (!track || !items.length) return;
+          track.classList.remove("chevron-track--all-current");
+          index = Math.max(0, Math.min(index, items.length - 1));
+          items.forEach(function (li, j) {
+            var on = j === index;
             li.classList.toggle("is-chevron-current", on);
             if (on) {
               li.setAttribute("aria-current", "step");
@@ -362,20 +532,29 @@
               li.removeAttribute("aria-current");
             }
           });
+          return index;
         }
 
-        function setAllChevronsHighlighted() {
-          refreshSteps();
-          if (!steps.length) return;
-          var track = getTrack();
-          if (!track) return;
-          allHighlighted = true;
-          idx = steps.length - 1;
+        function setTrackAllHighlighted(track) {
+          var items = listItems(track);
+          if (!track || !items.length) return;
           track.classList.add("chevron-track--all-current");
-          steps.forEach(function (li) {
+          items.forEach(function (li) {
             li.classList.add("is-chevron-current");
             li.removeAttribute("aria-current");
           });
+        }
+
+        function initComingChangesChevrons() {
+          phase = "skaha";
+          skahaIdx = 0;
+          cavernIdx = 0;
+          skahaAll = false;
+          cavernAll = false;
+          clearTrack(getCavernTrack());
+          clearTrack(getSkahaTrack());
+          var skaha = getSkahaTrack();
+          skahaIdx = setTrackStep(skaha, 0);
         }
 
         function isComingChangesActive() {
@@ -389,16 +568,16 @@
 
         function onSlideChanged() {
           if (isComingChangesActive()) {
-            setChevronStep(0);
+            initComingChangesChevrons();
           } else {
-            clearAllHighlighted();
+            clearTrack(getSkahaTrack());
+            clearTrack(getCavernTrack());
           }
         }
 
         Reveal.on("ready", function () {
-          refreshSteps();
           if (isComingChangesActive()) {
-            setChevronStep(0);
+            initComingChangesChevrons();
           }
         });
         Reveal.on("slidechanged", onSlideChanged);
@@ -419,37 +598,105 @@
 
             if (!next && !prev) return;
 
-            refreshSteps();
-            if (steps.length === 0) return;
+            var skahaT = getSkahaTrack();
+            var cavernT = getCavernTrack();
+            var skahaItems = listItems(skahaT);
+            var cavernItems = listItems(cavernT);
+            var nSkaha = skahaItems.length;
+            var nCavern = cavernItems.length;
+
+            if (!nSkaha || !nCavern) return;
+
+            function skahaSingleMax() {
+              return nSkaha - 1;
+            }
+            function cavernSingleMax() {
+              return nCavern - 1;
+            }
 
             if (next) {
-              if (allHighlighted) {
-                return;
-              }
-              if (idx >= steps.length - 1) {
+              if (phase === "skaha") {
+                if (!skahaAll) {
+                  if (skahaIdx < skahaSingleMax()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    skahaIdx = setTrackStep(skahaT, skahaIdx + 1);
+                  } else {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    setTrackAllHighlighted(skahaT);
+                    skahaAll = true;
+                  }
+                  return;
+                }
+                /* skahaFull → start cavern */
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                setAllChevronsHighlighted();
+                clearTrack(skahaT);
+                skahaAll = false;
+                phase = "cavern";
+                cavernIdx = setTrackStep(cavernT, 0);
                 return;
               }
-              e.preventDefault();
-              e.stopImmediatePropagation();
-              setChevronStep(idx + 1);
+              /* phase === "cavern" */
+              if (!cavernAll) {
+                if (cavernIdx < cavernSingleMax()) {
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+                  cavernIdx = setTrackStep(cavernT, cavernIdx + 1);
+                } else {
+                  e.preventDefault();
+                  e.stopImmediatePropagation();
+                  setTrackAllHighlighted(cavernT);
+                  cavernAll = true;
+                }
+                return;
+              }
+              /* cavernFull → reveal next slide */
               return;
             }
 
-            if (prev) {
-              if (allHighlighted) {
+            /* prev */
+            if (phase === "cavern") {
+              if (cavernAll) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                setChevronStep(steps.length - 1);
+                cavernIdx = cavernSingleMax();
+                cavernIdx = setTrackStep(cavernT, cavernIdx);
+                cavernAll = false;
                 return;
               }
-              if (idx > 0) {
+              if (cavernIdx > 0) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                setChevronStep(idx - 1);
+                cavernIdx = setTrackStep(cavernT, cavernIdx - 1);
+                return;
               }
+              /* cavern step 0 → back to skaha all highlighted */
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              clearTrack(cavernT);
+              phase = "skaha";
+              setTrackAllHighlighted(skahaT);
+              skahaAll = true;
+              skahaIdx = skahaSingleMax();
+              return;
+            }
+
+            /* phase === "skaha" */
+            if (skahaAll) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              skahaIdx = skahaSingleMax();
+              skahaIdx = setTrackStep(skahaT, skahaIdx);
+              skahaAll = false;
+              return;
+            }
+            if (skahaIdx > 0) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              skahaIdx = setTrackStep(skahaT, skahaIdx - 1);
+              return;
             }
           },
           true

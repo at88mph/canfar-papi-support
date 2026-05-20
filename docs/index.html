@@ -40,8 +40,7 @@
                       User calls <span class="flow-code">skaha</span>
                     </p>
                     <p class="flow-detail">
-                      HTTP request (sessions, jobs, resources) with bearer token or
-                      cookies.
+                      HTTP request with bearer token.
                     </p>
                   </div>
                 </div>
@@ -87,8 +86,7 @@
                   aria-label="Access decision"
                 >
                   <div class="flow-outcome flow-outcome--ok">
-                    <strong>Allowed</strong> — request proceeds (sessions, jobs,
-                    etc.).
+                    <strong>Allowed</strong> — request proceeds.
                   </div>
                   <div class="flow-outcome flow-outcome--deny">
                     <strong>Denied</strong> — no match &rarr; e.g. 403.
@@ -182,8 +180,7 @@
                     </p>
                     <p class="flow-detail">
                       The client presents a
-                      <span class="flow-code">Bearer</span> token on the Skaha
-                      request (sessions, jobs, resources).
+                      <span class="flow-code">Bearer</span> token on the Skaha request.
                     </p>
                   </div>
                 </div>
@@ -343,7 +340,7 @@
             </li>
           </ul>
         </section>
-        <section id="skaha-changes">
+        <section id="skaha-changes" class="web-service-changes">
           <h2>Skaha Modifications</h2>
           <h3>Web Service</h3>
           <ul>
@@ -372,7 +369,7 @@
                         baseURL: "https://permissions.srcnet.skao.int/api"
                         authAPIBaseURL: "https://authn.srcnet.skao.int/api"
                         type: "route"
-                        route: "/skaha/v1"
+                        route: "/skaha"
                         name: "canfar-api"
                         version: "1"
                         method: "GET"
@@ -385,6 +382,20 @@
               ·
               <a href="https://github.com/opencadc/deployments/pull/400">PR #400</a>
             </p>
+        </section>
+        <section id="cavern-modifications" class="web-service-changes">
+          <h2>Cavern Modifications</h2>
+          <h3>Web Service</h3>
+          <ul>
+            <li>Accept configuration for the Permissions API (OpenCADC <span class="flow-code">cadc-permissions-client</span>)</li>
+            <li>Defaults to accepting allocation owner as administrator to create a new allocation</li>
+            <li>Remove Admin API key trust access</li>
+          </ul>
+          <h3>Helm Chart</h3>
+          <ul>
+            <li>Add new configuration for the Permissions API</li>
+            <li>Remove Admin API key trust access</li>
+          </ul>
         </section>
         <section id="cavern-helm-changes">
           <h2>Cavern Helm Chart Modifications</h2>
@@ -400,7 +411,7 @@
                       baseURL: "https://permissions.srcnet.skao.int/api"
                       authAPIBaseURL: "https://authn.srcnet.skao.int/api"
                       type: "route"
-                      route: "/cavern/nodes/home/{username}"
+                      route: "/nodes/home/{username}"
                       name: "canfar-api"
                       version: "1"
                       method: "GET"
@@ -415,11 +426,6 @@
           <p class="deck-lead">
             Backend changes are easiest to show as <strong>observable traces</strong>.
           </p>
-          <!-- <ul class="deck-bullet-list deck-bullet-list--compact">
-            <li>Use <strong>staging or sandbox</strong>; redact Bearer tokens and request IDs.</li>
-            <li>Show Skaha/Cavern outbound checks against the Permissions API <strong>base URL</strong> from Helm.</li>
-            <li>Align routes with config: <span class="flow-code">/skaha/v1</span> (sessions) and <span class="flow-code">/cavern/nodes/home/{username}</span> (home).</li>
-          </ul> -->
           <h3>Sanitized sample trace</h3>
           <pre class="demo-transcript"><code class="bash" style="overflow: initial;"># Skaha → Permissions API
 GET https://example.org/skaha/v1/session
@@ -445,21 +451,15 @@ checkErrors: 200 for https://permissions.srcnet.skao.int/api/v1/authorise/route/
               <strong>Risk:</strong> each protected operation can incur
               <strong>about three extra network calls</strong> compared with
               legacy checks—in practice, latency, timeouts, and failure modes tie
-              your services to Permissions API availability and behaviour.
+              services to Permissions API availability and behaviour.
             </li>
             <li>
-              <strong>Mitigate:</strong> explore <strong>caching</strong> (TTLs,
-              keyed by resource and identity where policy allows),
-              concurrency limits, graceful degradation docs, and
-              <strong>clear user messaging</strong> when centralized policy denies
-              access or the dependency is unavailable.
+              <strong>Mitigate:</strong> explore <strong>caching</strong> with TTLs (Time-To-Live), potentially keyed by resource and identity.
             </li>
             <li>
               <strong>Who to contact for access:</strong> entitlement changes live
               in one place—point people to how they should
-              <strong>request permission</strong> now. Example contact (replace before
-              publishing):
-              <a href="mailto:canfar-access@skao.int?subject=CANFAR%20access%20request">canfar-access@skao.int</a>
+              <strong>request permission</strong> (e.g. Send request to <a href="mailto:canfar-access@skao.int?subject=CANFAR%20access%20request">access-control@srcnet.skao.int</a>).
             </li>
           </ul>
         </section>

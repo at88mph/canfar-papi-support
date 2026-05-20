@@ -424,8 +424,8 @@
   --chevron-tip: rgba(255, 255, 255, 0.04);
 }
 
-#skaha-changes h3 {
-  margin-top: 1.1em;
+.web-service-changes h3 {
+  margin-top: 0.6em;
 }
 
 .small-text {
